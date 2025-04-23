@@ -1,5 +1,4 @@
 import { invoke } from "@tauri-apps/api/core";
-import { sep } from "@tauri-apps/api/path";
 
 let greetInputEl: HTMLInputElement | null;
 let greetMsgEl: HTMLElement | null;
@@ -99,6 +98,11 @@ async function loadDirectory(path: string) {
         item.addEventListener("click", () => {
           loadDirectory(entry.path);
         });
+      } else if (entry.name.endsWith('.c')) {
+        // Handle clicks on C files
+        item.addEventListener("click", () => {
+          openCFileViewer(entry.path);
+        });
       }
       
       fileList.appendChild(item);
@@ -112,4 +116,74 @@ async function loadDirectory(path: string) {
       dirResultEl.textContent = `Error loading directory: ${error}`;
     }
   }
+}
+
+async function openCFileViewer(filePath: string) {
+  try {
+    // Clear the directory listing
+    if (!dirResultEl) return;
+    dirResultEl.innerHTML = "Loading C file and generating assembly...";
+    
+    // Use our Rust backend command to read the file content instead of direct fs access
+    const cFileContent = await invoke('read_file_content', { path: filePath }) as string;
+    
+    // Get the assembly from the Rust function
+    const asmContent = await invoke('get_asm_from_file', { filename: filePath }) as string;
+    
+    // Create the side-by-side viewer
+    createSideBySideView(filePath, cFileContent, asmContent);
+    
+  } catch (error) {
+    console.error("Failed to process C file:", error);
+    if (dirResultEl) {
+      dirResultEl.innerHTML = `<div class="error-message">Error processing file: ${error}</div>
+                               <button class="back-button" id="back-to-dir">Back to Directory</button>`;
+      
+      document.getElementById('back-to-dir')?.addEventListener('click', () => {
+        loadDirectory(currentPath);
+      });
+    }
+  }
+}
+
+function createSideBySideView(filePath: string, cContent: string, asmContent: string) {
+  if (!dirResultEl) return;
+  
+  // Extract just the filename from the path
+  const fileName = filePath.split(/[/\\]/).pop() || filePath;
+  
+  // Create the viewer container
+  dirResultEl.innerHTML = `
+    <div class="file-viewer-container">
+      <div class="file-viewer-header">
+        <h3>${fileName}</h3>
+        <button class="back-button" id="back-to-dir">Back to Directory</button>
+      </div>
+      <div class="file-viewer-content">
+        <div class="file-panel">
+          <div class="panel-header">C Source</div>
+          <pre class="code-content c-code">${escapeHtml(cContent)}</pre>
+        </div>
+        <div class="file-panel">
+          <div class="panel-header">Assembly Output</div>
+          <pre class="code-content asm-code">${escapeHtml(asmContent)}</pre>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add event listener for the back button
+  document.getElementById('back-to-dir')?.addEventListener('click', () => {
+    loadDirectory(currentPath);
+  });
+}
+
+// Helper function to safely escape HTML
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }

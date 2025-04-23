@@ -170,6 +170,100 @@ button {
   margin: 20px 0;
 }
 
+/* File Viewer Styles */
+.file-viewer-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.file-viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 0 10px;
+}
+
+.file-viewer-content {
+  display: flex;
+  gap: 20px;
+  height: 70vh;
+}
+
+.file-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+.panel-header {
+  background-color: #f3f3f3;
+  padding: 10px 15px;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+}
+
+.code-content {
+  flex: 1;
+  overflow: auto;
+  padding: 15px;
+  margin: 0;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre;
+  tab-size: 4;
+}
+
+.c-code {
+  background-color: #fafafa;
+}
+
+.asm-code {
+  background-color: #f5f5f5;
+}
+
+.back-button {
+  padding: 8px 16px;
+  background-color: #4c8dff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.back-button:hover {
+  background-color: #3a7bd5;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-weight: bold;
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #ffebee;
+  border-radius: 4px;
+  border-left: 4px solid #d32f2f;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .file-viewer-content {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .file-panel {
+    height: 50vh;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;
@@ -217,5 +311,42 @@ button {
   
   .item-desc {
     color: #aaa;
+  }
+
+  .file-panel {
+    background-color: #222;
+    border: 1px solid #444;
+  }
+  
+  .panel-header {
+    background-color: #333;
+    color: #eee;
+    border-bottom: 1px solid #555;
+  }
+  
+  .code-content {
+    color: #ddd;
+  }
+  
+  .c-code {
+    background-color: #2a2a2a;
+  }
+  
+  .asm-code {
+    background-color: #252525;
+  }
+  
+  .back-button {
+    background-color: #3d6ebd;
+  }
+  
+  .back-button:hover {
+    background-color: #2a5da8;
+  }
+  
+  .error-message {
+    background-color: #391515;
+    color: #ff6b6b;
+    border-left: 4px solid #b71c1c;
   }
 }
